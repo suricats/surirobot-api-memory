@@ -1,6 +1,6 @@
 # Surirobot Memory API
 
-API used to retrieve some informations stored by the surirobot.
+API made with Django used to retrieve some informations stored by the surirobot.
 The informations include data like sensors, identifications, various logs, and pictures.
 Currently made to be a POC. The function of this repository may change in the future.
 
