@@ -19,11 +19,13 @@ mkvirtualenv api-memory && workon api-memory
 
 * Install dependencies
 ```shell
+cd api
 pip install -r requirements.txt
 ```
 
 * Configure .env with database informations
 ```shell
+cd api
 cp .env.example .env
 ```
 
