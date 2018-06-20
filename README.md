@@ -19,7 +19,6 @@ mkvirtualenv api-memory && workon api-memory
 
 * Install dependencies
 ```shell
-cd api
 pip install -r requirements.txt
 ```
 
