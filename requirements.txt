@@ -1,0 +1,5 @@
+Django
+django-rest-auth
+djangorestframework
+drf-generators
+mysqlclient
