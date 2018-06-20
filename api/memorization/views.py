@@ -4,7 +4,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from memorization.models import Info, User, Picture, SensorData, Log
 from memorization.serializers import InfoSerializer, UserSerializer, PictureSerializer, SensorDataSerializer, LogSerializer
-
+from rest_framework.decorators import action
+from django.http import JsonResponse
 
 from rest_framework import viewsets
 
@@ -15,6 +16,10 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    @action(methods=['get'], detail=True)
+    def pictures(self, request, id):
+        pass
 
 
 class InfoViewSet(viewsets.ModelViewSet):
