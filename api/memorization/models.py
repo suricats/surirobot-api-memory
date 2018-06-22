@@ -23,7 +23,7 @@ class Info(models.Model):
 
 class User(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    firstname = models.TextField(max_length=50, null=True)
+    firstname = models.TextField(max_length=50, null=False)
     lastname = models.TextField(max_length=70, null=True)
     email = models.EmailField(max_length=254, null=True)
 

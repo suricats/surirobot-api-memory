@@ -20,8 +20,9 @@ from rest_framework.authtoken import views
 from . import views as general_views
 
 urlpatterns = [
+    path('', general_views.home),
     path('admin/', admin.site.urls),
     path('memorize/', include('memorization.urls')),
     path('login/', views.obtain_auth_token),
-    path('register/',general_views.create_auth)
+    path('register/', general_views.create_auth)
 ]
