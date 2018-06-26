@@ -3,7 +3,9 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpResponse
+from django.template import loader
 import json
+
 
 @api_view(['POST'])
 def create_auth(request):
@@ -28,3 +30,9 @@ def create_auth(request):
 def home(request):
     if request.method == 'GET':
         return HttpResponse("<html><body>Surirobot Memory API</body></html>")
+
+
+def login(request):
+    template = loader.get_template('rest_framework/login_base.html')
+    context = {}
+    return HttpResponse(template.render(context, request))
