@@ -3,3 +3,5 @@ django-rest-auth
 djangorestframework
 drf-generators
 mysqlclient
+django-rest-swagger
+python-dotenv
