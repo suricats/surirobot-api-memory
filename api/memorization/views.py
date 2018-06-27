@@ -8,15 +8,14 @@ from rest_framework.decorators import action, api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import JsonResponse
-
 from rest_framework import viewsets
-
+import datetime as dt
 
 class UserViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API for users detected by face recognition
     retrieve:
-        Return a user instance.
+        Return user informations.
 
     list:
         Return all users, ordered by most recently joined.
@@ -32,12 +31,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
     update:
         Update a user.
+
+    encodings:
+        Return encodings of specific user
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    @action(methods=['get'], detail=True, url_path='pictures', url_name='pictures')
-    def pictures(self, request, pk=None):
+    # @action(methods=['get'], detail=True, url_path='pictures', url_name='pictures')
+    def encodings(self, request, pk=None):
         try:
             user = User.objects.get(pk=pk)
             pictures = Picture.objects.filter(user_id=pk)
@@ -69,6 +71,31 @@ class SensorDataViewSet(viewsets.ModelViewSet):
     """
     queryset = SensorData.objects.all()
     serializer_class = SensorDataSerializer
+
+    def last(self, request, t_type=None):
+        try:
+            if t_type:
+                sensor = SensorData.objects.filter(type=t_type).latest('created')
+            else:
+                sensor = SensorData.objects.latest('created')
+            serializer = SensorDataSerializer(sensor)
+            return Response(serializer.data)
+        except SensorData.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def time_range(self, request, t_from, t_to, t_type=None):
+        try:
+            t_from = dt.datetime.fromtimestamp(float(t_from))
+            t_to = dt.datetime.fromtimestamp(float(t_to))
+            if t_type:
+                sensors = SensorData.objects.filter(type=t_type)
+                sensors = sensors.filter(created__range=(t_from, t_to))
+            else:
+                sensors = SensorData.objects.filter(created__range=(t_from, t_to))
+            serializer = SensorDataSerializer(sensors, many=True)
+            return Response(serializer.data)
+        except SensorData.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class LogViewSet(viewsets.ModelViewSet):
