@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from rest_framework import viewsets
 import datetime as dt
 
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API for users detected by face recognition
