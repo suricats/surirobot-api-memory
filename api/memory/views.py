@@ -1,8 +1,8 @@
-from memorization.models import Info, User, Picture, SensorData, Log
+from .models import Info, User, Encoding, SensorData, Log
 import datetime as dt
 
-from memorization.models import Info, User, Picture, SensorData, Log
-from memorization.serializers import InfoSerializer, UserSerializer, PictureSerializer, SensorDataSerializer, \
+from .models import Info, User, Encoding, SensorData, Log
+from .serializers import InfoSerializer, UserSerializer, EncodingSerializer, SensorDataSerializer, \
     LogSerializer
 from rest_framework import status
 from rest_framework import viewsets
@@ -40,8 +40,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def encodings(self, request, pk=None):
         try:
             user = User.objects.get(pk=pk)
-            pictures = Picture.objects.filter(user_id=pk)
-            serializer = PictureSerializer(pictures, many=True)
+            encodings = Encoding.objects.filter(user_id=pk)
+            serializer = EncodingSerializer(encodings, many=True)
             return Response(serializer.data)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -49,18 +49,18 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class InfoViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows Infos to be viewed or edited.
+    description: This API deletes/uninstalls a device.
     """
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
 
 
-class PictureViewSet(viewsets.ModelViewSet):
+class EncodingViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows Pictures to be viewed or edited.
     """
-    queryset = Picture.objects.all()
-    serializer_class = PictureSerializer
+    queryset = Encoding.objects.all()
+    serializer_class = EncodingSerializer
 
 
 class SensorDataViewSet(viewsets.ModelViewSet):

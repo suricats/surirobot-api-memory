@@ -1,11 +1,11 @@
 from django.urls import path, include, re_path
 from rest_framework import routers
-from memorization import views
+from . import views
 
 
 router = routers.DefaultRouter()
 router.register('users', views.UserViewSet)
-router.register('pictures', views.PictureViewSet)
+router.register('encodings', views.EncodingViewSet)
 router.register('sensors', views.SensorDataViewSet)
 router.register('logs', views.LogViewSet)
 router.register('infos', views.InfoViewSet)
