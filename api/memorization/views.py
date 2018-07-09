@@ -1,15 +1,12 @@
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
 from memorization.models import Info, User, Picture, SensorData, Log
-from memorization.serializers import InfoSerializer, UserSerializer, PictureSerializer, SensorDataSerializer, LogSerializer
-from rest_framework.decorators import action, api_view
-from rest_framework import status
-from rest_framework.response import Response
-from django.http import JsonResponse
-from rest_framework import viewsets
 import datetime as dt
+
+from memorization.models import Info, User, Picture, SensorData, Log
+from memorization.serializers import InfoSerializer, UserSerializer, PictureSerializer, SensorDataSerializer, \
+    LogSerializer
+from rest_framework import status
+from rest_framework import viewsets
+from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):

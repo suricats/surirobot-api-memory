@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from memorization.models import Info, User, Picture, Log, SensorData
+from .models import Info, User, Picture, Log, SensorData
 
 
 class InfoSerializer(serializers.ModelSerializer):
