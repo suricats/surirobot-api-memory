@@ -61,3 +61,5 @@ class Log(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+

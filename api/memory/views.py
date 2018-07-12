@@ -11,9 +11,9 @@ from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
     """
-    API for users detected by face recognition
+    API for users registered by face recognition
     retrieve:
-        Return user informations.
+        Return user information.
 
     list:
         Return all users, ordered by most recently joined.
@@ -49,7 +49,24 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class InfoViewSet(viewsets.ModelViewSet):
     """
-    description: This API deletes/uninstalls a device.
+    API for storing and retrieving general information
+    retrieve:
+        Return a information.
+
+    list:
+        Return all information.
+
+    create:
+        Create a new information.
+
+    delete:
+        Remove an existing information.
+
+    partial_update:
+        Update one or more fields on an existing information.
+
+    update:
+        Update a information.
     """
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
@@ -57,7 +74,24 @@ class InfoViewSet(viewsets.ModelViewSet):
 
 class EncodingViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows Pictures to be viewed or edited.
+    API for storing and retrieving general encoding
+    retrieve:
+        Return a encoding.
+
+    list:
+        Return all encodings.
+
+    create:
+        Create a new encoding.
+
+    delete:
+        Remove an existing encoding.
+
+    partial_update:
+        Update one or more fields on an existing encoding.
+
+    update:
+        Update a encoding.
     """
     queryset = Encoding.objects.all()
     serializer_class = EncodingSerializer
@@ -65,7 +99,30 @@ class EncodingViewSet(viewsets.ModelViewSet):
 
 class SensorDataViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows SensorDatas to be viewed or edited.
+    API for storing and retrieving sensor information
+    retrieve:
+        Return a sensor information.
+
+    list:
+        Return all sensor information.
+
+    create:
+        Create a new sensor information.
+
+    delete:
+        Remove an existing sensor information.
+
+    partial_update:
+        Update one or more fields on an existing sensor information.
+
+    update:
+        Update a sensor information.
+
+    last:
+        Return the last sensor information of the type defined (all by default)
+
+    time_range:
+        Return  all sensor information created on the time range of the type (all by default) defined
     """
     queryset = SensorData.objects.all()
     serializer_class = SensorDataSerializer
@@ -98,7 +155,24 @@ class SensorDataViewSet(viewsets.ModelViewSet):
 
 class LogViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows Logs to be viewed or edited.
+    API for storing and retrieving logs
+    retrieve:
+        Return a log.
+
+    list:
+        Return all logs.
+
+    create:
+        Create a new log.
+
+    delete:
+        Remove an existing log.
+
+    partial_update:
+        Update one or more fields on an existing log.
+
+    update:
+        Update a log.
     """
     queryset = Log.objects.all()
     serializer_class = LogSerializer
