@@ -5,3 +5,5 @@ drf-generators
 mysqlclient
 django-rest-swagger
 python-dotenv
+gunicorn==19.8.1
+
