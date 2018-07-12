@@ -1,8 +1,8 @@
-from memorization.models import Info, User, Picture, SensorData, Log
+from .models import Info, User, Encoding, SensorData, Log
 import datetime as dt
 
-from memorization.models import Info, User, Picture, SensorData, Log
-from memorization.serializers import InfoSerializer, UserSerializer, PictureSerializer, SensorDataSerializer, \
+from .models import Info, User, Encoding, SensorData, Log
+from .serializers import InfoSerializer, UserSerializer, EncodingSerializer, SensorDataSerializer, \
     LogSerializer
 from rest_framework import status
 from rest_framework import viewsets
@@ -11,9 +11,9 @@ from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
     """
-    API for users detected by face recognition
+    API for users registered by face recognition
     retrieve:
-        Return user informations.
+        Return user information.
 
     list:
         Return all users, ordered by most recently joined.
@@ -40,8 +40,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def encodings(self, request, pk=None):
         try:
             user = User.objects.get(pk=pk)
-            pictures = Picture.objects.filter(user_id=pk)
-            serializer = PictureSerializer(pictures, many=True)
+            encodings = Encoding.objects.filter(user_id=pk)
+            serializer = EncodingSerializer(encodings, many=True)
             return Response(serializer.data)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -49,23 +49,80 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class InfoViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows Infos to be viewed or edited.
+    API for storing and retrieving general information
+    retrieve:
+        Return a information.
+
+    list:
+        Return all information.
+
+    create:
+        Create a new information.
+
+    delete:
+        Remove an existing information.
+
+    partial_update:
+        Update one or more fields on an existing information.
+
+    update:
+        Update a information.
     """
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
 
 
-class PictureViewSet(viewsets.ModelViewSet):
+class EncodingViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows Pictures to be viewed or edited.
+    API for storing and retrieving general encoding
+    retrieve:
+        Return a encoding.
+
+    list:
+        Return all encodings.
+
+    create:
+        Create a new encoding.
+
+    delete:
+        Remove an existing encoding.
+
+    partial_update:
+        Update one or more fields on an existing encoding.
+
+    update:
+        Update a encoding.
     """
-    queryset = Picture.objects.all()
-    serializer_class = PictureSerializer
+    queryset = Encoding.objects.all()
+    serializer_class = EncodingSerializer
 
 
 class SensorDataViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows SensorDatas to be viewed or edited.
+    API for storing and retrieving sensor information
+    retrieve:
+        Return a sensor information.
+
+    list:
+        Return all sensor information.
+
+    create:
+        Create a new sensor information.
+
+    delete:
+        Remove an existing sensor information.
+
+    partial_update:
+        Update one or more fields on an existing sensor information.
+
+    update:
+        Update a sensor information.
+
+    last:
+        Return the last sensor information of the type defined (all by default)
+
+    time_range:
+        Return  all sensor information created on the time range of the type (all by default) defined
     """
     queryset = SensorData.objects.all()
     serializer_class = SensorDataSerializer
@@ -98,7 +155,24 @@ class SensorDataViewSet(viewsets.ModelViewSet):
 
 class LogViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows Logs to be viewed or edited.
+    API for storing and retrieving logs
+    retrieve:
+        Return a log.
+
+    list:
+        Return all logs.
+
+    create:
+        Create a new log.
+
+    delete:
+        Remove an existing log.
+
+    partial_update:
+        Update one or more fields on an existing log.
+
+    update:
+        Update a log.
     """
     queryset = Log.objects.all()
     serializer_class = LogSerializer

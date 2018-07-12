@@ -5,3 +5,4 @@ drf-generators
 mysqlclient
 django-rest-swagger
 python-dotenv
+PyYAML

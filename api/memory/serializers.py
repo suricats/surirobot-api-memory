@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Info, User, Picture, Log, SensorData
+from .models import Info, User, Encoding, Log, SensorData
 
 
 class InfoSerializer(serializers.ModelSerializer):
@@ -16,9 +16,9 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('created', )
 
 
-class PictureSerializer(serializers.ModelSerializer):
+class EncodingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Picture
+        model = Encoding
         fields = '__all__'
         read_only_fields = ('created', 'updated')
 

@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  title: API Emotions
+  version: v1
+  description: This API contains all the endpoints needed by the surirobot to be able to recognize humans emotions.
+servers:
+  - url: 'https://emotions.api.suricats-consulting.com/api'
+    description: Main (production) server
+  - url: 'https://emotions.api.surirobot.fr/api'
+    description: Dev server
+paths:
+  /microsoft/analyse:
+    post:
+      summary: Extract emotion from picture
+      operationId: emotionMicrosoftPicture
+      tags:
+        - Picture
+      requestBody:
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          description: Operation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MicrosoftPictureResponse'
+        400:
+          description: Wrong parameter(s) or header(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: API Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        503:
+          description: Microsoft API is not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    MicrosoftPictureResponse:
+      required:
+        - emotion
+        - percent
+      properties:
+        emotion:
+          type: string
+        percent:
+          type: number
+          format: float
+    Error:
+      required:
+        - code
+        - msg
+      properties:
+        code:
+          type: string
+          enum:
+            - api_error
+            - external_api_error
+            - api_throttling
+            - invalid_credentials
+            - operation_failed
+            - missing_parameter
+            - bad_parameter
+            - bad_header
+            - missing_header
+        msg:
+          type: string
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
