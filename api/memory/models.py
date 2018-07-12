@@ -14,6 +14,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class Info(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     type = models.TextField(max_length=50, blank=False)
     data = models.TextField(blank=False)
 
@@ -23,6 +24,7 @@ class Info(models.Model):
 
 class User(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     firstname = models.TextField(max_length=50, null=False)
     lastname = models.TextField(max_length=70, null=True)
     email = models.EmailField(max_length=254, null=True)
@@ -33,6 +35,7 @@ class User(models.Model):
 
 class SensorData(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     type = models.TextField(max_length=50, blank=False)
     data = models.TextField(blank=False)
     location = models.TextField(max_length=50, blank=False)
@@ -41,11 +44,11 @@ class SensorData(models.Model):
         ordering = ('created',)
 
 
-class Picture(models.Model):
+class Encoding(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    path = models.TextField()
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    value = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ('created',)
@@ -58,3 +61,5 @@ class Log(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+
