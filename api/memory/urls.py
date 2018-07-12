@@ -24,6 +24,10 @@ user_detail = views.UserViewSet.as_view({
 user_encodings = views.UserViewSet.as_view({
     'get': 'encodings'
 })
+sensor_list = views.SensorDataViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
 sensor_last = views.SensorDataViewSet.as_view({
     'get': 'last'
 })
@@ -36,6 +40,7 @@ urlpatterns = [
     # re_path(r'^users/$', user_list, name='user-list'),
     # re_path(r'^users/(?P<pk>[0-9]+)/$', user_list, name='user-detail'),
     re_path(r'^users/(?P<pk>[0-9]+)/encodings/$', user_encodings, name='user_encodings'),
+    re_path(r'^sensors/(?P<t_type>[\w\-]+)/$', sensor_list, name='sensor_list'),
     re_path(r'^sensors/last/$', sensor_last, name='sensor_last'),
     re_path(r'^sensors/last/(?P<t_type>[\w\-]+)/$', sensor_last, name='sensor_last_type'),
     re_path(r'^sensors/(?P<t_from>[0-9]+)/(?P<t_to>[0-9]+)/(?P<t_type>[\w\-]+)/$', sensor_duration, name='sensor_duration_t'),

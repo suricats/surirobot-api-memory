@@ -127,6 +127,15 @@ class SensorDataViewSet(viewsets.ModelViewSet):
     queryset = SensorData.objects.all()
     serializer_class = SensorDataSerializer
 
+    def list(self, request, t_type=None):
+        if t_type:
+            sensors = SensorData.objects.filter(type=t_type)
+
+        else:
+            sensors = self.queryset
+        serializer = self.get_serializer(sensors, many=True)
+        return Response(serializer.data)
+
     def last(self, request, t_type=None):
         try:
             if t_type:
