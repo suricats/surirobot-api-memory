@@ -4,6 +4,7 @@ COPY ./requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
 
 COPY . /app
+COPY ./static/* /static/rest_framework_swagger/
 WORKDIR /app
 
 EXPOSE 8000/tcp
