@@ -28,7 +28,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         # Rules engine
         notifications = []
         latest_temp_obj = SensorData.objects.filter(type="temperature").latest('created')
-        latest_humidity_obj = SensorData.objects.filter(type="temperature").latest('humidity')
+        latest_humidity_obj = SensorData.objects.filter(type="humidity").latest('created')
         # Memorized information
         latest_temperature = float(latest_temp_obj.data)
         latest_humidity = float(latest_humidity_obj.data)
