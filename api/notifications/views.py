@@ -28,7 +28,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         # Rules engine
         notifications = []
         latest_temp_obj = SensorData.objects.filter(type="temperature").latest('created')
-        latest_humidity_obj = SensorData.objects.filter(type="temperature").latest('humidity')
+        latest_humidity_obj = SensorData.objects.filter(type="humidity").latest('created')
         # Memorized information
         latest_temperature = float(latest_temp_obj.data)
         latest_humidity = float(latest_humidity_obj.data)
@@ -46,11 +46,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
                                       latest_temperature)})
         # Rule n° 3 : humidity is recent and greater than 80%
         if date > today and latest_humidity >= 80:
-            notifications.append({'type': 'message', 'target': 'all', 'data': "L'humidité est de {}°C. N'hésitez pas à vous dégourdir les jambes !".format(latest_humidity)})
+            notifications.append({'type': 'message', 'target': 'all', 'data': "L'humidité est de {}%. N'hésitez pas à vous dégourdir les jambes !".format(latest_humidity)})
         # Rule n° 4 : humidity is recent and lower than 20%
         if date > today and latest_humidity <= 20:
             notifications.append({'type': 'message', 'target': 'all',
-                                  'data': "L'humidité est de {}°C. Hydratez vous bien la peau et aérez la pièce.".format(
+                                  'data': "L'humidité est de {}%. Hydratez vous bien la peau et aérez la pièce.".format(
                                       latest_humidity)})
         return JsonResponse(notifications, safe=False)
 
