@@ -16,6 +16,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
     path('api/memory/', include(('memory.urls', 'reviews'), namespace='Memory')),
+    path('api/notifications/', include(('notifications.urls', 'reviews'), namespace='Notifications')),
     path('login/', views.obtain_auth_token),
     path('register/', general_views.create_auth)
 ]

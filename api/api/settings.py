@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'drf_generators',
     'memory',
+    'notifications',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
