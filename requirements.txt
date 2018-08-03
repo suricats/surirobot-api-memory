@@ -1,3 +1,4 @@
+python-dateutil
 pytz
 Django
 django-rest-auth
@@ -11,4 +12,3 @@ PyYAML
 whitenoise==3.3.1
 requests
 timezonefinder
-dateutil
