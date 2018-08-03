@@ -1,21 +1,16 @@
-import datetime as dt
-import time
+from datetime import datetime
 
 import timezonefinder as timezonefinder
 from dateutil import tz
-
-from memory.models import Info, User, Encoding, SensorData, Log
-from memory.serializers import InfoSerializer, UserSerializer, EncodingSerializer, SensorDataSerializer, LogSerializer
-from .models import Notification
-from .helpers import get_crypto, get_news, get_weather
-from .serializers import NotificationSerializer
-from rest_framework import status
+from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.response import Response
-from datetime import datetime
-import pytz
-from django.http import JsonResponse
-import requests
+
+from memory.models import SensorData
+from .helpers import get_weather
+from .models import Notification
+from .serializers import NotificationSerializer
+
 
 class NotificationViewSet(viewsets.ModelViewSet):
     """
