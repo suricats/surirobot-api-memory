@@ -11,3 +11,4 @@ PyYAML
 whitenoise==3.3.1
 requests
 timezonefinder
+dateutil
