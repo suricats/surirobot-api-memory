@@ -90,6 +90,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
                 spreadsheetId=self.SAMPLE_SPREADSHEET_ID,
                 range=self.SAMPLE_RANGE_NAME).execute()
             values = result.get('values', [])
+            print(values)
             if values and len(values) > 0 and len(values[0]) > 0:
                 if len(values[0]) > 1:
                     identity = values[0][1]
@@ -98,7 +99,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
                 notifications.append({'type': 'message', 'target': 'all',
                                   'data': "{} : {}".format(identity, values[0][0])})
         except:
-            pass
+            print('error')
         return JsonResponse(notifications, safe=False)
 
     def expiration(self, request):
