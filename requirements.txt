@@ -12,3 +12,5 @@ PyYAML
 whitenoise==3.3.1
 requests
 timezonefinder
+google-api-python-client
+oauth2client
