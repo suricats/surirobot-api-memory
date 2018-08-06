@@ -9,4 +9,4 @@ COPY . /app
 WORKDIR /app
 
 EXPOSE 8000/tcp
-ENTRYPOINT ["gunicorn",  "-w",  "4", "-b",  "0.0.0.0:8000", "--chdir", "api", "api.wsgi"]
+ENTRYPOINT ["gunicorn",  "-w",  "4", "-b",  "0.0.0.0:8000", "api.wsgi"]
