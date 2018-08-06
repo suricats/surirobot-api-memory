@@ -11,6 +11,9 @@ from .helpers import get_weather
 from .models import Notification
 from .serializers import NotificationSerializer
 
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file as oauth_file, client, tools
 
 class NotificationViewSet(viewsets.ModelViewSet):
     """
@@ -22,6 +25,10 @@ class NotificationViewSet(viewsets.ModelViewSet):
         Expire a notification
 
     """
+    service = None
+    SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+    SAMPLE_SPREADSHEET_ID = '1KMWiuyVzWGx-GZD94utaGPCPRYtrLHdplH2UOb9q-U4'
+    SAMPLE_RANGE_NAME = 'news!A2:B2'
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
 
@@ -76,7 +83,32 @@ class NotificationViewSet(viewsets.ModelViewSet):
                 notifications.append({'type': 'message', 'target': 'all',
                                       'data': "Demain c'est la pleine lune. N'oubliez pas votre appareil photo ;)"})
 
+        # Rule n°7 : Google Sheet
+        try:
+            self.initGoogleSheetEngine()
+            result = self.service.spreadsheets().values().get(
+                spreadsheetId=self.SAMPLE_SPREADSHEET_ID,
+                range=self.SAMPLE_RANGE_NAME).execute()
+            values = result.get('values', [])
+            if values and len(values) > 0 and len(values[0]) > 0:
+                if len(values[0]) > 1:
+                    identity = values[0][1]
+                else:
+                    identity = "Anonyme"
+                notifications.append({'type': 'message', 'target': 'all',
+                                  'data': "{} : {}".format(identity, values[0][0])})
+        except:
+            pass
         return JsonResponse(notifications, safe=False)
 
     def expiration(self, request):
         return Response('WIP')
+
+    def initGoogleSheetEngine(self):
+        if not self.service:
+            store = oauth_file.Storage('res/credentials/token.json')
+            creds = store.get()
+            if not creds or creds.invalid:
+                flow = client.flow_from_clientsecrets('res/credentials/google.json', self.SCOPES)
+                creds = tools.run_flow(flow, store)
+            self.service = build('sheets', 'v4', http=creds.authorize(Http()))
