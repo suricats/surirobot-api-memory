@@ -1,12 +1,12 @@
-from .models import Info, User, Encoding, SensorData, Log
 import datetime as dt
+
+from rest_framework import status
+from rest_framework import viewsets
+from rest_framework.response import Response
 
 from .models import Info, User, Encoding, SensorData, Log
 from .serializers import InfoSerializer, UserSerializer, EncodingSerializer, SensorDataSerializer, \
     LogSerializer
-from rest_framework import status
-from rest_framework import viewsets
-from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -33,6 +33,8 @@ class UserViewSet(viewsets.ModelViewSet):
     encodings:
         Return encodings of specific user
     """
+    def delete(self, request):
+        pass
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
