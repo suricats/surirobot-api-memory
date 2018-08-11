@@ -17,7 +17,6 @@ from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file as oauth_file, client, tools
 
-
 from .realtime import slack_notifications
 
 stop = threading.Event()
@@ -26,6 +25,7 @@ slack_notifications(stop)
 # stop the thread at exit
 atexit.register(stop.set)
 atexit.register(print, 'Slack realtime stopped.')
+
 
 class NotificationViewSet(viewsets.ModelViewSet):
     """
@@ -40,16 +40,18 @@ class NotificationViewSet(viewsets.ModelViewSet):
     service = None
     SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
     SAMPLE_SPREADSHEET_ID = '1KMWiuyVzWGx-GZD94utaGPCPRYtrLHdplH2UOb9q-U4'
-    SAMPLE_RANGE_NAME = 'news!A2:B2'
+    SAMPLE_RANGE_NAME = 'news!A2:B4'
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
 
     def get_notifications(self, request):
         # Rules engine
         notifications = []
-        latest_temp_obj = SensorData.objects.filter(type="temperature").latest('created')
-        latest_humidity_obj = SensorData.objects.filter(type="humidity").latest('created')
-
+        try:
+            latest_temp_obj = SensorData.objects.filter(type="temperature").latest('created')
+            latest_humidity_obj = SensorData.objects.filter(type="humidity").latest('created')
+        except:
+            return JsonResponse(notifications, safe=False)
         # Localisation (faked for the moment)
         latitude = 48.8589506
         longitude = 2.276848
@@ -111,14 +113,16 @@ class NotificationViewSet(viewsets.ModelViewSet):
                 spreadsheetId=self.SAMPLE_SPREADSHEET_ID,
                 range=self.SAMPLE_RANGE_NAME).execute()
             values = result.get('values', [])
-            if values and len(values) > 0 and len(values[0]) > 0:
-                if len(values[0]) > 1:
-                    identity = values[0][1]
-                else:
-                    identity = "Anonyme"
-                notifications.append({'type': 'message', 'target': 'all',
-                                      'data': "{} : {}".format(identity, values[0][0])})
-        except:
+            if values:
+                for value in values:
+                    if len(value) > 1:
+                        identity = value[1]
+                    else:
+                        identity = "Anonyme"
+                    notifications.append({'type': 'message', 'target': 'all',
+                                          'data': "{} : {}".format(identity, value[0])})
+        except Exception as e:
+            print('Google Sheets error : {}'.format(e))
             pass
         return JsonResponse(notifications, safe=False)
 
