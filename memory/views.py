@@ -134,7 +134,7 @@ class SensorDataViewSet(viewsets.ModelViewSet):
             sensors = SensorData.objects.filter(type=t_type)
 
         else:
-            sensors = self.queryset
+            sensors = SensorData.objects.all()
         serializer = self.get_serializer(sensors, many=True)
         return Response(serializer.data)
 
