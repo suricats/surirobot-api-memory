@@ -20,7 +20,6 @@ def slack_notifications(stop_event):
     global last_opening_notification
     global last_closing_notification
     mc = 'magnetic-contact'
-    SensorData.objects.filter(type=mc).delete()
     # Localisation of Paris for timezone
     latitude = 48.8589506
     longitude = 2.276848
@@ -35,7 +34,7 @@ def slack_notifications(stop_event):
     # Rules
     # Case n°1 : opening between 6h and 10h and not closed on the first 5min
     openings_morning = SensorData.objects.filter(type=mc).filter(data='0').filter(
-        created__range=(today.replace(hour=6), today.replace(hour=10)))
+        created__range=(today.replace(hour=6), today.replace(hour=11)))
     if openings_morning and actual_date.day > last_opening_notification.day:
         delay = timedelta(minutes=5)
         last_opening = openings_morning[len(openings_morning)-1]
