@@ -1,3 +1,5 @@
+import atexit
+import threading
 
 from django.contrib import admin
 from django.urls import path, include
@@ -6,6 +8,13 @@ from rest_framework.authtoken import views
 from .swagger_schema import SwaggerSchemaView
 
 from . import views as general_views
+from notifications.realtime import slack_notifications
+
+stop = threading.Event()
+slack_notifications(stop)
+# stop the thread at exit
+atexit.register(stop.set)
+atexit.register(print, 'Slack realtime stopped.')
 
 
 urlpatterns = [

@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import timezonefinder as timezonefinder
 from dateutil import tz
-import threading
-import atexit
 from django.http import JsonResponse
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file as oauth_file, client, tools
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -12,19 +13,6 @@ from memory.models import SensorData
 from .helpers import get_weather
 from .models import Notification
 from .serializers import NotificationSerializer
-
-from googleapiclient.discovery import build
-from httplib2 import Http
-from oauth2client import file as oauth_file, client, tools
-
-from .realtime import slack_notifications
-
-stop = threading.Event()
-
-slack_notifications(stop)
-# stop the thread at exit
-atexit.register(stop.set)
-atexit.register(print, 'Slack realtime stopped.')
 
 
 class NotificationViewSet(viewsets.ModelViewSet):

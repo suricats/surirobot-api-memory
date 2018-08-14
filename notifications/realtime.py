@@ -16,7 +16,7 @@ headers = {'Content-Type': 'application/json'}
 
 last_opening_notification = datetime.now().replace(day=datetime.now().day-1)
 last_closing_notification = datetime.now().replace(day=datetime.now().day-1)
-opening_range = [6, 11]
+opening_range = [6, 12]
 opening_delay = timedelta(minutes=5)
 closing_range = [18, 2]
 closing_delay = timedelta(minutes=15)
