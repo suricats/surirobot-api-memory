@@ -45,6 +45,7 @@ def slack_notifications(stop_event):
         # Case : Opening happened in range, no notification was send today, actual time is still in approximate range
         logger.info('Opening happened in range : {}'.format(bool(opening_range)))
         logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_opening_notification.day)))
+        logger.info('Last notification date : {}'.format(last_opening_notification.created))
         logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(hour=opening_range[1]) + opening_delay)))
         if openings_morning and actual_date.day > last_opening_notification.day and actual_date <= today.replace(hour=opening_range[1])+opening_delay:
 
@@ -56,7 +57,7 @@ def slack_notifications(stop_event):
             logger.info('Date observed : {}'.format(last_opening.created))
             # Case : No closings during a short delay
             if not recent_closings and actual_date >= last_opening.created + opening_delay:
-                last_opening_notification = actual_date
+                last_opening_notification = datetime.now(tz=current_tz)
                 logger.info('Slack notifications sended.')
                 data = json.dumps({"text": "Beaubourg est ouvert ! :door:"})
                 requests.post(url=slack_url, data=data, headers=headers)
@@ -71,7 +72,7 @@ def slack_notifications(stop_event):
                 created__range=(last_closing.created, last_closing.created + closing_delay))
             # Case : No openings
             if not recent_openings:
-                last_closing_notification = actual_date
+                last_closing_notification = datetime.now(tz=current_tz)
                 logger.info('Slack notifications sended.')
                 data = json.dumps({"text": "Bonne nuit les suricats :night_with_stars:"})
                 requests.post(url=slack_url, data=data, headers=headers)
