@@ -16,7 +16,7 @@ headers = {'Content-Type': 'application/json'}
 
 last_opening_notification = datetime.now().replace(day=datetime.now().day-1)
 last_closing_notification = datetime.now().replace(day=datetime.now().day-1)
-opening_range = [6, 12]
+opening_range = [6, 13]
 opening_delay = timedelta(minutes=5)
 closing_range = [18, 2]
 closing_delay = timedelta(minutes=15)
@@ -45,7 +45,7 @@ def slack_notifications(stop_event):
         # Case : Opening happened in range, no notification was send today, actual time is still in approximate range
         logger.info('Opening happened in range : {}'.format(bool(opening_range)))
         logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_opening_notification.day)))
-        logger.info('Last notification date : {}'.format(last_opening_notification.created))
+        logger.info('Last notification date : {}'.format(last_opening_notification))
         logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(hour=opening_range[1]) + opening_delay)))
         if openings_morning and actual_date.day > last_opening_notification.day and actual_date <= today.replace(hour=opening_range[1])+opening_delay:
 
