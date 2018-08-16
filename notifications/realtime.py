@@ -46,8 +46,8 @@ def slack_notifications(stop_event):
         logger.info('Opening happened in range : {}'.format(bool(opening_range)))
         logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_opening_notification.day)))
         logger.info('Last notification date : {}'.format(last_opening_notification))
-        logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(hour=opening_range[1]) + opening_delay)))
-        if openings_morning and actual_date.day > last_opening_notification.day and actual_date <= today.replace(hour=opening_range[1])+opening_delay:
+        logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(hour=opening_range[1])+opening_delay + timedelta(minutes=5))))
+        if openings_morning and actual_date.day > last_opening_notification.day and actual_date <= today.replace(hour=opening_range[1])+opening_delay + timedelta(minutes=5):
 
             last_opening = openings_morning[len(openings_morning)-1]
             recent_closings = SensorData.objects.filter(type=mc).filter(data='1').filter(
@@ -62,7 +62,7 @@ def slack_notifications(stop_event):
                 data = json.dumps({"text": "Beaubourg est ouvert ! :door:"})
                 requests.post(url=slack_url, data=data, headers=headers)
 
-        # Case n°2 : closing between 18h and 2h and no opening in the 15min
+        # Case n°2 : closing between 18h and 2h and no opening in the 15min but opening in the day
         closings_evening = SensorData.objects.filter(type=mc).filter(data='1').filter(
             created__range=(today.replace(hour=closing_range[0]), today.replace(day=today.day + 1, hour=closing_range[1])))
         # Case : Closing happened in range, no notification was send today, actual time is still in approximate range
@@ -70,7 +70,7 @@ def slack_notifications(stop_event):
             last_closing = closings_evening[len(openings_morning)-1]
             recent_openings = SensorData.objects.filter(type=mc).filter(data='0').filter(
                 created__range=(last_closing.created, last_closing.created + closing_delay))
-            # Case : No openings
+            # Case : No recent openings but daily opening
             if not recent_openings:
                 last_closing_notification = datetime.now(tz=current_tz)
                 logger.info('Slack notifications sended.')
