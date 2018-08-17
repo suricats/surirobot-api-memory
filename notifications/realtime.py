@@ -35,6 +35,7 @@ class SlackNotificationsThread(Thread):
         return self._stop_event.is_set()
 
     def run(self):
+        logger.info('Slack notifications thread started')
         last_opening_notification = datetime.now().replace(day=datetime.now().day - 1)
         last_closing_notification = datetime.now().replace(day=datetime.now().day - 1)
         while not self.stopped():
