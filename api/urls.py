@@ -8,13 +8,13 @@ from rest_framework.authtoken import views
 from .swagger_schema import SwaggerSchemaView
 
 from . import views as general_views
-from notifications.realtime import slack_notifications
+from notifications.realtime import SlackNotificationsThread
 
-stop = threading.Event()
-slack_notifications(stop)
+slack_thread = SlackNotificationsThread(interval=10)
 # stop the thread at exit
-atexit.register(stop.set)
+atexit.register(slack_thread.stop)
 atexit.register(print, 'Slack realtime stopped.')
+slack_thread.start()
 
 
 urlpatterns = [
