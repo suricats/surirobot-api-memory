@@ -103,7 +103,7 @@ class SlackNotificationsThread(Thread):
                 logger.info('Last notification date : {}'.format(last_closing_notification))
                 logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(day=today.day + 1, hour=closing_range[1])+closing_delay + timedelta(minutes=5))))
 
-                if closings_evening and actual_date.day > last_closing_notification.day and actual_date.day == last_opening_notification and actual_date <= today.replace(day=today.day + 1, hour=closing_range[1])+closing_delay + timedelta(minutes=5):
+                if closings_evening and actual_date.day > last_closing_notification.day and actual_date.day == last_opening_notification.day and actual_date <= today.replace(day=today.day + 1, hour=closing_range[1])+closing_delay + timedelta(minutes=5):
                     last_closing = closings_evening[len(closings_evening)-1]
                     recent_openings = SensorData.objects.filter(type=mc).filter(data='0').filter(
                         created__range=(last_closing.created, last_closing.created + closing_delay))
