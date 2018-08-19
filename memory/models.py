@@ -16,7 +16,7 @@ class Info(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     type = models.TextField(max_length=50, blank=False)
-    data = models.TextField(blank=False)
+    data = models.TextField(blank=True)
 
     class Meta:
         ordering = ('created',)
