@@ -1,3 +1,4 @@
+celery
 python-dateutil
 pytz
 Django
