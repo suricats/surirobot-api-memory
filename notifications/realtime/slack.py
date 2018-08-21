@@ -6,12 +6,13 @@ import json
 import time
 from datetime import datetime, timedelta
 import traceback
+import redis
 import timezonefinder as timezonefinder
 from dateutil import tz
 from django.db import connection
 from memory.models import SensorData, Info
 from memory.serializers import InfoSerializer
-logger = logging.getLogger('REALTIME')
+logger = logging.getLogger('REALTIME_SLACK')
 SLACK_NOTIFICATIONS_TIME = 10
 slack_url = os.environ.get('SLACK_URL')
 headers = {'Content-Type': 'application/json'}
@@ -36,7 +37,6 @@ class SlackNotificationsThread(Thread):
         return self._stop_event.is_set()
 
     def run(self):
-
         while not self.stopped():
             logger.info('Slack notifications processing..')
             # Get notifications date

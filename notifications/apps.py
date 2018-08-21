@@ -5,8 +5,8 @@ class NotificationsConfig(AppConfig):
     name = 'notifications'
     slack_thread = None
     def ready(self):
-        print('oeuf mimosa')
-        from .realtime import SlackNotificationsThread
+        # Start slack thread
+        from .realtime.slack import SlackNotificationsThread
         self.slack_thread = SlackNotificationsThread(interval=10)
         # stop the thread at exit
         atexit.register(self.slack_thread.stop)

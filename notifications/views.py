@@ -32,14 +32,14 @@ class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
 
-    def get_notifications(self, request):
+    def notifications_process(self):
         # Rules engine
         notifications = []
         try:
             latest_temp_obj = SensorData.objects.filter(type="temperature").latest('created')
             latest_humidity_obj = SensorData.objects.filter(type="humidity").latest('created')
         except:
-            return JsonResponse(notifications, safe=False)
+            return notifications
         # Localisation (faked for the moment)
         latitude = 48.8589506
         longitude = 2.276848
@@ -112,6 +112,10 @@ class NotificationViewSet(viewsets.ModelViewSet):
         except Exception as e:
             print('Google Sheets error : {}'.format(e))
             pass
+        return notifications
+
+    def get_notifications(self, request=None):
+        notifications = self.notifications_process()
         return JsonResponse(notifications, safe=False)
 
     def expiration(self, request):
