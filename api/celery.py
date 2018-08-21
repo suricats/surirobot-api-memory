@@ -18,8 +18,12 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
-
-
+app.conf.beat_schedule = {
+    'slack-notifications-every-20-seconds': {
+        'task': 'notifications_slack',
+        'schedule': 20.0
+    },
+}
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))

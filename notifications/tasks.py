@@ -1,16 +1,115 @@
-from celery import shared_task
+import json
+import logging
+import os
+import traceback
+from datetime import datetime, timedelta
+from api.celery import app
+import requests
+import timezonefinder as timezonefinder
+from celery import task
+from dateutil import tz
+from django.db import connection
+
+from memory.models import SensorData, Info
+from memory.serializers import InfoSerializer
+
+logger = logging.getLogger('REALTIME')
+SLACK_NOTIFICATIONS_TIME = 10
+slack_url = os.environ.get('SLACK_URL')
+headers = {'Content-Type': 'application/json'}
+
+opening_range = [6, 12]
+opening_delay = timedelta(minutes=5)
+closing_range = [18, 2]
+closing_delay = timedelta(minutes=15)
+
+mc = 'magnetic-contact'
+# Localisation of Paris for timezone
+latitude = 48.8589506
+longitude = 2.276848
+# Timezone
+tf = timezonefinder.TimezoneFinder()
+current_tz = tz.gettz(tf.timezone_at(lng=longitude, lat=latitude))
 
 
-@shared_task
-def add(x, y):
-    return x + y
+@app.task(name="notifications_slack")
+def slack():
+    logger.info('Slack notifications processing..')
+    # Get notifications date
+    try:
+        last_opening_notification = Info.objects.filter(type='opening-notification-slack').latest(
+            'created').created
+    except Info.DoesNotExist:
+        last_opening_notification = datetime.now().replace(day=datetime.now().day - 1)
+    try:
+        last_closing_notification = Info.objects.filter(type='closing-notification-slack').latest(
+            'created').created
+    except Info.DoesNotExist:
+        last_closing_notification = datetime.now().replace(day=datetime.now().day - 1)
+    try:
 
+        # Dates
+        actual_date = datetime.now(tz=current_tz)
+        today = datetime(actual_date.year, actual_date.month, actual_date.day, tzinfo=current_tz)
 
-@shared_task
-def mul(x, y):
-    return x * y
+        # Rules
+        # Case n°1 : opening between range and not closed on the first 5min
+        openings_morning = SensorData.objects.filter(type=mc).filter(data='0').filter(
+            created__range=(today.replace(hour=opening_range[0]), today.replace(hour=opening_range[1])))
+        # Case : Opening happened in range, no notification was send today, actual time is still in approximate range
+        logger.info('Actual date : {} '.format(actual_date))
+        logger.info('Opening :')
+        logger.info('Opening happened in range : {}'.format(bool(opening_range)))
+        logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_opening_notification.day)))
+        logger.info('Last notification date : {}'.format(last_opening_notification))
+        logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(hour=opening_range[1])+opening_delay + timedelta(minutes=5))))
+        if openings_morning and actual_date.day > last_opening_notification.day and actual_date <= today.replace(hour=opening_range[1])+opening_delay + timedelta(minutes=5):
 
+            last_opening = openings_morning[len(openings_morning)-1]
+            recent_closings = SensorData.objects.filter(type=mc).filter(data='1').filter(
+                created__range=(last_opening.created, last_opening.created + opening_delay))
+            logger.info('No closings : {}'.format(bool(not recent_closings)))
+            logger.info('In short delay : {}'.format(bool(actual_date >= last_opening.created + opening_delay )))
+            logger.info('Date observed : {}'.format(last_opening.created))
+            # Case : No closings during a short delay
+            if not recent_closings and actual_date >= last_opening.created + opening_delay:
+                serializer = InfoSerializer(data={'type': 'opening-notification-slack'})
+                if serializer.is_valid():
+                    serializer.save()
+                    logger.info('Slack opening notifications sended.')
+                    data = json.dumps({"text": "Beaubourg est ouvert ! :door:"})
+                    requests.post(url=slack_url, data=data, headers=headers)
+                else:
+                    logger.error('Slack opening notifications serializer')
 
-@shared_task
-def xsum(numbers):
-    return sum(numbers)
+        # Case n°2 : closing between 18h and 2h and no opening in the 15min but opening in the day
+        closings_evening = SensorData.objects.filter(type=mc).filter(data='1').filter(
+            created__range=(today.replace(hour=closing_range[0]), today.replace(day=today.day + 1, hour=closing_range[1])))
+        # Case : Closing happened in range, no notification was send today, actual time is still in approximate range , opening notification sent today
+        logger.info('Closing :')
+        logger.info('Closing happened in range : {}'.format(bool(closings_evening)))
+        logger.info('Opening notification was sent today : {}'.format(bool(actual_date.day == last_opening_notification.day)))
+        logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_closing_notification.day)))
+        logger.info('Last notification date : {}'.format(last_closing_notification))
+        logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(day=today.day + 1, hour=closing_range[1])+closing_delay + timedelta(minutes=5))))
+
+        if closings_evening and actual_date.day > last_closing_notification.day and actual_date.day == last_opening_notification.day and actual_date <= today.replace(day=today.day + 1, hour=closing_range[1])+closing_delay + timedelta(minutes=5):
+            last_closing = closings_evening[len(closings_evening)-1]
+            recent_openings = SensorData.objects.filter(type=mc).filter(data='0').filter(
+                created__range=(last_closing.created, last_closing.created + closing_delay))
+            # Case : No recent openings but daily opening
+            if not recent_openings:
+                serializer = InfoSerializer(data={'type': 'closing-notification-slack'})
+                if serializer.is_valid():
+                    serializer.save()
+                    logger.info('Slack closing notifications sended.')
+                    data = json.dumps({"text": "Bonne nuit les suricats :night_with_stars:"})
+                    requests.post(url=slack_url, data=data, headers=headers)
+                else:
+                    logger.error('Slack closing notifications serializer')
+
+    except Exception as e:
+        logger.error('{}: {}'.format(type(e).__name__, e))
+        traceback.print_exc()
+    connection.close()
+

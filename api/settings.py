@@ -23,9 +23,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'abc')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', True)
+DEBUG = int(os.environ.get('DJANGO_DEBUG', '0'))
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOST', '').split()
 
+# CELERY STUFF
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL','redis://localhost:6379')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_BROKER_URL','redis://localhost:6379')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Paris'
 
 # Application definition
 
@@ -34,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_swagger',
     'drf_generators',
+    'django_celery_beat',
     'memory',
     'notifications',
     'django.contrib.admin',

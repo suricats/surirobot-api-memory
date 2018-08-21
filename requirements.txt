@@ -16,3 +16,4 @@ requests
 timezonefinder
 google-api-python-client
 oauth2client
+django-celery-beat
