@@ -9,10 +9,6 @@ from .swagger_schema import SwaggerSchemaView
 
 from . import views as general_views
 
-
-
-
-
 urlpatterns = [
     path('', RedirectView.as_view(url='/docs/', permanent=False), name='docs'),
     path('docs/', SwaggerSchemaView.as_view()),

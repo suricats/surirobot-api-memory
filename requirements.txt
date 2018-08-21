@@ -1,3 +1,5 @@
+redis
+celery
 python-dateutil
 pytz
 Django
@@ -14,3 +16,4 @@ requests
 timezonefinder
 google-api-python-client
 oauth2client
+django-celery-beat
