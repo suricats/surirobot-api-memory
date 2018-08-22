@@ -1,4 +1,6 @@
 import os
+from datetime import timedelta
+
 from dotenv import load_dotenv, find_dotenv
 
 # Load .env
@@ -18,10 +20,15 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
+app.autodiscover_tasks(['api.celery.notifications.slack', 'api.celery.notifications.client'])
 app.conf.beat_schedule = {
     'slack-notifications-every-20-seconds': {
-        'task': 'notifications_slack',
-        'schedule': 20.0
+        'task': 'notifications.slack',
+        'schedule': 20
+    },
+    'client-notifications-every-30-minutes': {
+        'task': 'notifications.client',
+        'schedule': timedelta(minutes=30)
     },
 }
 @app.task(bind=True)
