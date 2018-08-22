@@ -34,9 +34,6 @@ sensor_last = views.SensorDataViewSet.as_view({
 sensor_duration = views.SensorDataViewSet.as_view({
     'get': 'time_range'
 })
-encoding_picture = views.EncodingViewSet.as_view({
-    'post': 'picture'
-})
 
 urlpatterns = [
 
@@ -48,6 +45,5 @@ urlpatterns = [
     re_path(r'^sensors/(?P<t_type>[\w\-]+)/$', sensor_list, name='sensor_list'),
     re_path(r'^sensors/(?P<t_from>[0-9]+)/(?P<t_to>[0-9]+)/(?P<t_type>[\w\-]+)/$', sensor_duration, name='sensor_duration_t'),
     re_path(r'^sensors/(?P<t_from>[0-9]+)/(?P<t_to>[0-9]+)/$', sensor_duration, name='sensor_duration'),
-    re_path(r'^encodings/picture/$', encoding_picture, name='encoding_picture'),
     path('', include(router.urls)),
 ]
