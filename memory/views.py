@@ -1,5 +1,7 @@
 import datetime as dt
+import json
 
+import face_recognition as face_recognition
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -94,7 +96,29 @@ class EncodingViewSet(viewsets.ModelViewSet):
 
     update:
         Update a encoding.
+
+    picture:
+        Allow to add an encoding with a picture
     """
+    def picture(self, request):
+        if 'picture' in request.FILES:
+            file = request.FILES['picture']
+            img = face_recognition.load_image_file(file)
+            encodings = face_recognition.face_encodings(img, None, 10)
+            if encodings:
+                face = " ".join(map(str, encodings[0]))
+                new_dict = request.data.copy()
+                new_dict.update({'value': face})
+                serializer = self.get_serializer(data=new_dict)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            else:
+                return Response('No face on the picture.', status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        else:
+            return Response({'picture': ['This field is required']}, status=status.HTTP_400_BAD_REQUEST)
     queryset = Encoding.objects.all()
     serializer_class = EncodingSerializer
 
