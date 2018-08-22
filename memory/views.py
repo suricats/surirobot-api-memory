@@ -1,5 +1,4 @@
 import datetime as dt
-import json
 
 import face_recognition as face_recognition
 from rest_framework import status
