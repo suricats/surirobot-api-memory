@@ -1,3 +1,4 @@
+face_recognition
 redis
 celery
 python-dateutil
