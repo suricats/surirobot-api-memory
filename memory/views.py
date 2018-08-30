@@ -119,33 +119,36 @@ class SlackViewSet(viewsets.ModelViewSet):
     serializer_class = InfoSerializer
     slack_keys_type = 'key_keeper_beaubourg'
     permission_classes = (AllowAny,)
-
+    
     def slack_keys(self, request):
+        msg = {
+            "response_type": "in_channel",
+            "text": "Je n'ai pas compris cette commande",
+        }
         logger.info(request.data)
         if 'text' in request.data and 'user_name' in request.data:
             text = request.data['text']
             username = request.data['user_name']
-            msg = '?'
             if text == 'add':
                 serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
                 if serializer.is_valid():
                     serializer.save()
-                    msg = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
+                    msg['text'] = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
             elif text == 'remove':
                 key_keeper = Info.objects.filter(type=self.slack_keys_type).filter(data=username)
                 if key_keeper:
                     key_keeper.delete()
-                    msg = "Je t'ai enlevé de la liste {}.".format(username)
+                    msg['text'] = "Je t'ai enlevé de la liste {}.".format(username)
                 else:
-                    msg = "Tu n'étais pas dans la liste."
+                    msg['text'] = "Tu n'étais pas dans la liste."
             elif text == 'who':
                 key_keepers = Info.objects.filter(type=self.slack_keys_type)
-                msg = 'Les suricats possédant une clé : '
+                msg['text'] = 'Les suricats possédant une clé : '
                 if not key_keepers :
-                    msg = "Personne ne s'est enregistré comme possédant une clé."
+                    msg['text'] = "Personne ne s'est enregistré comme possédant une clé."
                 for keeper in key_keepers:
-                    msg += ' @{}'.format(keeper.data)
-            return Response(msg, status=status.HTTP_200_OK)
+                    msg['text'] += ' @{}'.format(keeper.data)
+            return Response(msg['text'], status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
