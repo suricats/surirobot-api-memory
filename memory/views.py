@@ -2,6 +2,8 @@ import datetime as dt
 import logging
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .models import Info, User, Encoding, SensorData, Log
@@ -78,6 +80,7 @@ class InfoViewSet(viewsets.ModelViewSet):
     serializer_class = InfoSerializer
     slack_keys_type = 'key_keeper_beaubourg'
 
+    @permission_classes((AllowAny,))
     def slack_keys(self, request):
         logger.info(request.data)
         if 'text' in request.data and 'user_name' in request.data:
