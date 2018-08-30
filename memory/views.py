@@ -109,6 +109,45 @@ class InfoViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class SlackViewSet(viewsets.ModelViewSet):
+    """
+    API for communicating with Slack
+    slack_keys:
+        Get informations about key keepers of Beaubourg
+    """
+    queryset = Info.objects.all()
+    serializer_class = InfoSerializer
+    slack_keys_type = 'key_keeper_beaubourg'
+    permission_classes = (AllowAny,)
+
+    def slack_keys(self, request):
+        logger.info(request.data)
+        if 'text' in request.data and 'user_name' in request.data:
+            text = request.data['text']
+            username = request.data['user_name']
+            msg = '?'
+            if text == 'add':
+                serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
+                if serializer.is_valid():
+                    serializer.save()
+                    msg = "@{} Tu es maintenant enregisitré comme possedant une clé.".format(username)
+            elif text == 'remove':
+                key_keeper = Info.objects.filter(type=self.slack_keys_type).filter(data=username)
+                if key_keeper:
+                    key_keeper.delete()
+                    msg = "Je t'ai enlevé de la liste @{}.".format(username)
+                else:
+                    msg = 'Nope'
+            elif text == 'who':
+                key_keepers = Info.objects.filter(type=self.slack_keys_type)
+                msg = 'Les suricats possédant une clé : s'
+                for keeper in key_keepers:
+                    msg += ' @{}'.format(keeper.data)
+            return Response(msg, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 class EncodingViewSet(viewsets.ModelViewSet):
     """
     API for storing and retrieving general encoding

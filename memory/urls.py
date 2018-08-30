@@ -34,7 +34,7 @@ sensor_last = views.SensorDataViewSet.as_view({
 sensor_duration = views.SensorDataViewSet.as_view({
     'get': 'time_range'
 })
-slack_keys = views.InfoViewSet.as_view({
+slack_keys = views.SlackViewSet.as_view({
     'post': 'slack_keys'
 })
 
