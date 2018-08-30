@@ -118,37 +118,80 @@ class SlackViewSet(viewsets.ModelViewSet):
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
     slack_keys_type = 'key_keeper_beaubourg'
+    slack_keys_away_type = 'key_keeper_beaubourg_away'
     permission_classes = (AllowAny,)
     
     def slack_keys(self, request):
         msg = {
             "response_type": "in_channel",
-            "text": "Je n'ai pas compris cette commande",
+            "text": "Je n'ai pas compris cette commande\n Les commandes valables sont : help, add, remove, who, away, available",
         }
         logger.info(request.data)
         if 'text' in request.data and 'user_name' in request.data:
             text = request.data['text']
             username = request.data['user_name']
             if text == 'add':
-                serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
-                if serializer.is_valid():
-                    serializer.save()
-                    msg['text'] = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
+                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(
+                    data=username)
+                if key_keeper:
+                    msg['text'] = "Tu es déjà dans la liste."
+                else:
+                    serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
+                    if serializer.is_valid():
+                        serializer.save()
+                        msg['text'] = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
             elif text == 'remove':
-                key_keeper = Info.objects.filter(type=self.slack_keys_type).filter(data=username)
+                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(data=username)
                 if key_keeper:
                     key_keeper.delete()
                     msg['text'] = "Je t'ai enlevé de la liste {}.".format(username)
                 else:
                     msg['text'] = "Tu n'étais pas dans la liste."
             elif text == 'who':
-                key_keepers = Info.objects.filter(type=self.slack_keys_type)
+                key_keepers = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type])
                 msg['text'] = 'Les suricats possédant une clé : '
-                if not key_keepers :
+                if not key_keepers:
                     msg['text'] = "Personne ne s'est enregistré comme possédant une clé."
                 for keeper in key_keepers:
-                    msg['text'] += ' @{}'.format(keeper.data)
-            return Response(msg['text'], status=status.HTTP_200_OK)
+                    msg['text'] += '\n- {}'.format(keeper.data)
+                    if keeper.type == self.slack_keys_away_type:
+                        msg['text'] += '(indisponible)'
+            elif text == 'away':
+                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(
+                    data=username)
+                if key_keeper:
+                    if key_keeper[0].type == self.slack_keys_away_type:
+                        msg['text'] = "Tu es déjà considéré comme indisponible"
+                    else:
+                        logger.info('before')
+                        key_keeper[0].type = self.slack_keys_away_type
+                        key_keeper[0].save()
+                        msg['text'] = "Tu es maintenant considéré comme indisponible"
+                else:
+                    msg['text'] = "Tu n'étais pas dans la liste."
+            elif text == 'available':
+                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(
+                    data=username)
+                if key_keeper:
+                    if key_keeper[0].type == self.slack_keys_type:
+                        msg['text'] = "Tu es déjà considéré comme disponible"
+                    else:
+                        logger.info('before')
+                        key_keeper[0].type = self.slack_keys_type
+                        key_keeper[0].save()
+                        msg['text'] = "Tu es maintenant considéré comme disponible"
+                else:
+                    msg['text'] = "Tu n'étais pas dans la liste."
+            elif text == 'help':
+                msg['text'] = "La commande /bbkey [commande] permet de gérer les possesseurs des clés de Beaubourg\n" \
+                              "Voici les commandes : \n" \
+                              "- add : Vous ajoute en tant que possesseur de clé\n" \
+                              "- remove : Vous enlève de la liste des possesseurs de clé \n" \
+                              "- who : Affiche les possesseurs de clé\n" \
+                              "- away : Indique que vous possédez une clé mais que vous n'êtes pas en mesure d'ouvrir BB\n" \
+                              "- available : Annule la commande précédente"
+            return Response(msg, status=status.HTTP_200_OK)
+
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
