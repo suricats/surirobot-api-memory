@@ -1,5 +1,5 @@
 import datetime as dt
-
+import logging
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from .models import Info, User, Encoding, SensorData, Log
 from .serializers import InfoSerializer, UserSerializer, EncodingSerializer, SensorDataSerializer, \
     LogSerializer
+
+logger = logging.getLogger('TESTER')
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -33,8 +35,10 @@ class UserViewSet(viewsets.ModelViewSet):
     encodings:
         Return encodings of specific user
     """
+
     def delete(self, request):
         pass
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -72,9 +76,34 @@ class InfoViewSet(viewsets.ModelViewSet):
     """
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
+    slack_keys_type = 'key_keeper_beaubourg'
 
     def slack_keys(self, request):
-        return Response(request.POST)
+        logger.info(request.data)
+        if 'text' in request.data and 'user_name' in request.data:
+            text = request.data['text']
+            username = request.data['user_name']
+            msg = '?'
+            if text == 'add':
+                serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
+                if serializer.is_valid():
+                    serializer.save()
+                    msg = "@{} Tu es maintenant enregisitré comme possedant une clé.".format(username)
+            elif text == 'remove':
+                key_keeper = Info.objects.filter(type=self.slack_keys_type).filter(data=username)
+                if key_keeper:
+                    key_keeper.delete()
+                    msg = "Je t'ai enlevé de la liste @{}.".format(username)
+                else:
+                    msg = 'Nope'
+            elif text == 'who':
+                key_keepers = Info.objects.filter(type=self.slack_keys_type)
+                msg = 'Les suricats possédant une clé : s'
+                for keeper in key_keepers:
+                    msg += ' @{}'.format(keeper.data)
+            return Response(msg, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class EncodingViewSet(viewsets.ModelViewSet):

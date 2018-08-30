@@ -173,6 +173,10 @@ LOGGING = {
         'REALTIME': {
             'handlers': ['console'],
             'level': 'DEBUG'
+        },
+        'TESTER': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
         }
     }
 }
