@@ -73,6 +73,9 @@ class InfoViewSet(viewsets.ModelViewSet):
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
 
+    def slack_keys(self, request):
+        return Response(request.POST)
+
 
 class EncodingViewSet(viewsets.ModelViewSet):
     """
