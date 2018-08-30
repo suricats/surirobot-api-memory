@@ -130,17 +130,19 @@ class SlackViewSet(viewsets.ModelViewSet):
                 serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
                 if serializer.is_valid():
                     serializer.save()
-                    msg = "@{} Tu es maintenant enregisitré comme possedant une clé.".format(username)
+                    msg = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
             elif text == 'remove':
                 key_keeper = Info.objects.filter(type=self.slack_keys_type).filter(data=username)
                 if key_keeper:
                     key_keeper.delete()
-                    msg = "Je t'ai enlevé de la liste @{}.".format(username)
+                    msg = "Je t'ai enlevé de la liste {}.".format(username)
                 else:
-                    msg = 'Nope'
+                    msg = "Tu n'étais pas dans la liste."
             elif text == 'who':
                 key_keepers = Info.objects.filter(type=self.slack_keys_type)
-                msg = 'Les suricats possédant une clé : s'
+                msg = 'Les suricats possédant une clé : '
+                if not key_keepers :
+                    msg = "Personne ne s'est enregistré comme possédant une clé."
                 for keeper in key_keepers:
                     msg += ' @{}'.format(keeper.data)
             return Response(msg, status=status.HTTP_200_OK)
