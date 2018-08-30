@@ -18,7 +18,7 @@ class CustomSchemaGenerator(SchemaGenerator):
             except:
                 yaml_doc = None
 
-        #Extract schema information from yaml
+        # Extract schema information from yaml
 
         if yaml_doc and type(yaml_doc) != str:
             _method_desc = yaml_doc.get('description', '')
