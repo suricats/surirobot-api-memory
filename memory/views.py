@@ -130,20 +130,22 @@ class SlackViewSet(viewsets.ModelViewSet):
         logger.info(request.data)
         if 'text' in request.data and 'user_name' in request.data:
             text = request.data['text']
-            username = request.data['user_name']
+            if text == 'hadd' or text == 'hremove':
+                username = self.hadji
+            else:
+                username = request.data['user_name']
             if text == 'add' or text == 'hadd':
                 key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(
                     data=username)
                 if key_keeper:
                     msg['text'] = "Tu es déjà dans la liste."
                 else:
-                    serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': self.hadji if text == 'hadd' else username})
+                    serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
                     if serializer.is_valid():
                         serializer.save()
                         msg['text'] = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
             elif text == 'remove' or text == 'hremove':
-                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(
-                    data=self.hadji if text == 'hadd' else username)
+                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(username)
                 if key_keeper:
                     key_keeper.delete()
                     msg['text'] = "Je t'ai enlevé de la liste {}.".format(username)
