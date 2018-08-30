@@ -124,7 +124,7 @@ class SlackViewSet(viewsets.ModelViewSet):
     def slack_keys(self, request):
         msg = {
             "response_type": "in_channel",
-            "text": "Je n'ai pas compris cette commande\n Les commandes valables sont : add, remove, who, away, available",
+            "text": "Je n'ai pas compris cette commande\n Les commandes valables sont : help, add, remove, who, away, available",
         }
         logger.info(request.data)
         if 'text' in request.data and 'user_name' in request.data:
@@ -182,6 +182,14 @@ class SlackViewSet(viewsets.ModelViewSet):
                         msg['text'] = "Tu es maintenant considéré comme disponible"
                 else:
                     msg['text'] = "Tu n'étais pas dans la liste."
+            elif text == 'help':
+                msg['text'] = "La commande /bbkey [commande] permet de gérer les possesseurs des clés de Beaubourg\n" \
+                              "Voici les commandes : \n" \
+                              "- add : Vous ajoute en tant que possesseur de clé\n" \
+                              "- remove : Vous enlève de la liste des possesseurs de clé \n" \
+                              "- who : Affiche les possesseurs de clé\n" \
+                              "- away : Indique que vous possédez une clé mais que vous n'êtes pas en mesure d'ouvrir BB\n" \
+                              "- available : Annule la commande précédente"
             return Response(msg, status=status.HTTP_200_OK)
 
         else:
