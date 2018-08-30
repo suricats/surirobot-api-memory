@@ -145,7 +145,7 @@ class SlackViewSet(viewsets.ModelViewSet):
                         serializer.save()
                         msg['text'] = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
             elif text == 'remove' or text == 'hremove':
-                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(username)
+                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(data=username)
                 if key_keeper:
                     key_keeper.delete()
                     msg['text'] = "Je t'ai enlevé de la liste {}.".format(username)
