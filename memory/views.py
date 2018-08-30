@@ -117,6 +117,7 @@ class SlackViewSet(viewsets.ModelViewSet):
     """
     queryset = Info.objects.all()
     serializer_class = InfoSerializer
+    hadji = 'M. Hadji'
     slack_keys_type = 'key_keeper_beaubourg'
     slack_keys_away_type = 'key_keeper_beaubourg_away'
     permission_classes = (AllowAny,)
@@ -130,18 +131,19 @@ class SlackViewSet(viewsets.ModelViewSet):
         if 'text' in request.data and 'user_name' in request.data:
             text = request.data['text']
             username = request.data['user_name']
-            if text == 'add':
+            if text == 'add' or text == 'hadd':
                 key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(
                     data=username)
                 if key_keeper:
                     msg['text'] = "Tu es déjà dans la liste."
                 else:
-                    serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': username})
+                    serializer = self.serializer_class(data={'type': self.slack_keys_type, 'data': self.hadji if text == 'hadd' else username})
                     if serializer.is_valid():
                         serializer.save()
                         msg['text'] = "{}, tu es maintenant enregisitré(e) comme possedant une clé.".format(username)
-            elif text == 'remove':
-                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(data=username)
+            elif text == 'remove' or text == 'hremove':
+                key_keeper = Info.objects.filter(type__in=[self.slack_keys_type, self.slack_keys_away_type]).filter(
+                    data=self.hadji if text == 'hadd' else username)
                 if key_keeper:
                     key_keeper.delete()
                     msg['text'] = "Je t'ai enlevé de la liste {}.".format(username)
@@ -189,7 +191,8 @@ class SlackViewSet(viewsets.ModelViewSet):
                               "- remove : Vous enlève de la liste des possesseurs de clé \n" \
                               "- who : Affiche les possesseurs de clé\n" \
                               "- away : Indique que vous possédez une clé mais que vous n'êtes pas en mesure d'ouvrir BB\n" \
-                              "- available : Annule la commande précédente"
+                              "- available : Annule la commande précédente\n" \
+                              "- hadd/hremove : Commandes spécifiques à M. Hadji"
             return Response(msg, status=status.HTTP_200_OK)
 
         else:
