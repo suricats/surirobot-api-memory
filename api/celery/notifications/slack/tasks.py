@@ -42,20 +42,22 @@ def slack():
         openings_morning = SensorData.objects.filter(type=mc).filter(data='0').filter(
             created__range=(today.replace(hour=OPENING_RANGE[0]), today.replace(hour=OPENING_RANGE[1])))
         # Case : Opening happened in range, no notification was send today, actual time is still in approximate range
-        # logger.info('Actual date : {} '.format(actual_date))
-        # logger.info('Opening :')
-        # logger.info('Opening happened in range : {}'.format(bool(OPENING_RANGE)))
-        # logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_opening_notification.day)))
-        # logger.info('Last notification date : {}'.format(last_opening_notification))
-        # logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(hour=OPENING_RANGE[1])+OPENING_DELAY + timedelta(minutes=5))))
+        if int(os.environ.get('LOG', '0')):
+            logger.info('Actual date : {} '.format(actual_date))
+            logger.info('Opening :')
+            logger.info('Opening happened in range : {}'.format(bool(OPENING_RANGE)))
+            logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_opening_notification.day)))
+            logger.info('Last notification date : {}'.format(last_opening_notification))
+            logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(hour=OPENING_RANGE[1])+OPENING_DELAY + timedelta(minutes=5))))
         if openings_morning and actual_date.day > last_opening_notification.day and actual_date <= today.replace(hour=OPENING_RANGE[1])+OPENING_DELAY + timedelta(minutes=5):
 
             last_opening = openings_morning[len(openings_morning)-1]
             recent_closings = SensorData.objects.filter(type=mc).filter(data='1').filter(
                 created__range=(last_opening.created, last_opening.created + OPENING_DELAY))
-            # logger.info('No closings : {}'.format(bool(not recent_closings)))
-            # logger.info('In short delay : {}'.format(bool(actual_date >= last_opening.created + OPENING_DELAY )))
-            # logger.info('Date observed : {}'.format(last_opening.created))
+            if int(os.environ.get('LOG', '0')):
+                logger.info('No closings : {}'.format(bool(not recent_closings)))
+                logger.info('In short delay : {}'.format(bool(actual_date >= last_opening.created + OPENING_DELAY )))
+                logger.info('Date observed : {}'.format(last_opening.created))
             # Case : No closings during a short delay
             if not recent_closings and actual_date >= last_opening.created + OPENING_DELAY:
                 serializer = InfoSerializer(data={'type': 'opening-notification-slack'})
@@ -71,12 +73,13 @@ def slack():
         closings_evening = SensorData.objects.filter(type=mc).filter(data='1').filter(
             created__range=(today.replace(hour=CLOSING_RANGE[0]), today.replace(day=today.day + 1, hour=CLOSING_RANGE[1])))
         # Case : Closing happened in range, no notification was send today, actual time is still in approximate range , opening notification sent today
-        # logger.info('Closing :')
-        # logger.info('Closing happened in range : {}'.format(bool(closings_evening)))
-        # logger.info('Opening notification was sent today : {}'.format(bool(actual_date.day == last_opening_notification.day)))
-        # logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_closing_notification.day)))
-        # logger.info('Last notification date : {}'.format(last_closing_notification))
-        # logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(day=today.day + 1, hour=CLOSING_RANGE[1])+CLOSING_DELAY + timedelta(minutes=5))))
+        if int(os.environ.get('LOG', '0')):
+            logger.info('Closing :')
+            logger.info('Closing happened in range : {}'.format(bool(closings_evening)))
+            logger.info('Opening notification was sent today : {}'.format(bool(actual_date.day == last_opening_notification.day)))
+            logger.info('No notification was sent today : {}'.format(bool(actual_date.day > last_closing_notification.day)))
+            logger.info('Last notification date : {}'.format(last_closing_notification))
+            logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= today.replace(day=today.day + 1, hour=CLOSING_RANGE[1])+CLOSING_DELAY + timedelta(minutes=5))))
 
         if closings_evening and actual_date.day > last_closing_notification.day and actual_date.day == last_opening_notification.day and actual_date <= today.replace(day=today.day + 1, hour=CLOSING_RANGE[1])+CLOSING_DELAY + timedelta(minutes=5):
             last_closing = closings_evening[len(closings_evening)-1]
