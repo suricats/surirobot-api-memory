@@ -20,7 +20,6 @@ headers = {'Content-Type': 'application/json'}
 @shared_task(name="notifications.slack")
 def slack():
     logger.info('Slack notifications processing..')
-    logger.info(os.environ.get('LOG', 'recked'))
     # Get notifications date
     try:
         last_opening_notification = Info.objects.filter(type='opening-notification-slack').latest(

@@ -10,7 +10,16 @@ Currently made to be a POC. The function of this repository may change in the fu
 * Virtualenvwrapper ```pip install virtualenvwrapper```
 * If you have some trouble with the command ```workon``` see : https://stackoverflow.com/questions/29900090/virtualenv-workon-doesnt-work
 
-## Installation 
+## Installation
+
+### Using Docker
+
+```shell
+docker build . -t api-memory
+docker run --env-file .env -p 8000:8000 api-memory
+```
+
+### From source
 
 * Clone repository 
 * Create virtualenv
@@ -23,13 +32,16 @@ mkvirtualenv api-memory && workon api-memory
 pip install -r requirements.txt
 ```
 
-* Configure .env with database informations
+## Configure the environment file
+* Configure .env
 ```shell
-cd api
 cp .env.example .env
 ```
+If you want to use the default environment
+- Fill only the ```REMOTE_DATA_LOGIN```  and ```REMOTE_DATA_PASSWD``` fields
+- Run the command : ```tools/get-env```
 
-* Run the server
+* Run the dev server
 ```shell
 cd api
 python manage.py runserver

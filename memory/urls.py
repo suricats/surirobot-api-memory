@@ -29,21 +29,24 @@ sensor_list = views.SensorDataViewSet.as_view({
     'post': 'create'
 })
 sensor_last = views.SensorDataViewSet.as_view({
-    'get': 'last'
+    'get': 'last',
 })
 sensor_duration = views.SensorDataViewSet.as_view({
     'get': 'time_range'
 })
+sensor_delete = views.SensorDataViewSet.as_view({
+    'delete': 'destroy'
+})
 slack_keys = views.SlackViewSet.as_view({
     'post': 'slack_keys'
 })
-
 urlpatterns = [
 
     # re_path(r'^users/$', user_list, name='user-list'),
     # re_path(r'^users/(?P<pk>[0-9]+)/$', user_list, name='user-detail'),
     re_path(r'^slack/keys/$', slack_keys, name='slack_keys'),
     re_path(r'^users/(?P<pk>[0-9]+)/encodings/$', user_encodings, name='user_encodings'),
+    re_path(r'^sensors/(?P<pk>[0-9]+)/$', sensor_delete, name='sensor_delete'),
     re_path(r'^sensors/last/$', sensor_last, name='sensor_last'),
     re_path(r'^sensors/last/(?P<t_type>[\w\-]+)/$', sensor_last, name='sensor_last_type'),
     re_path(r'^sensors/(?P<t_type>[\w\-]+)/$', sensor_list, name='sensor_list'),
