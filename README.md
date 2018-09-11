@@ -6,8 +6,9 @@ Currently made to be a POC. The function of this repository may change in the fu
 
 ## Requirements
 
-* Python3
-* Virtualenvwrapper 
+* Python3 
+* Virtualenvwrapper ```pip install virtualenvwrapper```
+* If you have some trouble with the command ```workon``` see : https://stackoverflow.com/questions/29900090/virtualenv-workon-doesnt-work
 
 ## Installation 
 
