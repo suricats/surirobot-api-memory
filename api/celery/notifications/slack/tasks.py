@@ -46,28 +46,29 @@ def slack():
         limit_opening_notification = last_opening_notification.replace(hour=0, minute=0, second=0) + timedelta(days=1)
         limit_opening_approximate_range = today.replace(hour=OPENING_RANGE[1])+OPENING_DELAY + timedelta(minutes=5)
         if int(os.environ.get('LOG', '0')):
-            logger.info('Actual date : {} '.format(actual_date))
-            logger.info('Opening :')
-            logger.info('Opening happened in range : {}'.format(bool(OPENING_RANGE)))
-            logger.info('No notification was sent today : {}'.format(bool(actual_date > limit_opening_notification)))
-            logger.info('Last notification date : {}'.format(last_opening_notification))
-            logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= limit_opening_approximate_range)))
+            pass
+            # logger.info('Actual date : {} '.format(actual_date))
+            # logger.info('Opening :')
+            # logger.info('Opening happened in range : {}'.format(bool(OPENING_RANGE)))
+            # logger.info('No notification was sent today : {}'.format(bool(actual_date > limit_opening_notification)))
+            # logger.info('Last notification date : {}'.format(last_opening_notification))
+            # logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= limit_opening_approximate_range)))
         if openings_morning and actual_date > limit_opening_notification and actual_date <= limit_opening_approximate_range:
 
             last_opening = openings_morning[len(openings_morning)-1]
             recent_closings = SensorData.objects.filter(type=mc).filter(data='1').filter(
                 created__range=(last_opening.created, last_opening.created + OPENING_DELAY))
             if int(os.environ.get('LOG', '0')):
-                logger.info('No closings : {}'.format(bool(not recent_closings)))
-                logger.info('In short delay : {}'.format(bool(actual_date >= last_opening.created + OPENING_DELAY )))
-                logger.info('Date observed : {}'.format(last_opening.created))
+                # logger.info('No closings : {}'.format(bool(not recent_closings)))
+                # logger.info('In short delay : {}'.format(bool(actual_date >= last_opening.created + OPENING_DELAY )))
+                # logger.info('Date observed : {}'.format(last_opening.created))
             # Case : No closings during a short delay
             if not recent_closings and actual_date >= last_opening.created + OPENING_DELAY:
                 serializer = InfoSerializer(data={'type': 'opening-notification-slack'})
                 if serializer.is_valid():
                     serializer.save()
                     logger.info('Slack opening notifications sended.')
-                    data = json.dumps({"text": "Beaubourg est ouvert ! :door:"})
+                    data = json.dumps({"text": "Bin ch'est y a quequ'un qui a ouvert la cahute ! :door:"})
                     requests.post(url=slack_url, data=data, headers=headers)
                 else:
                     logger.error('Slack opening notifications serializer')
@@ -79,12 +80,13 @@ def slack():
         limit_closing_notification = last_closing_notification.replace(hour=0, minute=0, second=0) + timedelta(days=1)
         limit_closing_approximate_range = today.replace(hour=CLOSING_RANGE[0])+CLOSING_DELAY + timedelta(hours=abs(CLOSING_RANGE[1] - CLOSING_RANGE[0]))
         if int(os.environ.get('LOG', '0')):
-            logger.info('Closing :')
-            logger.info('Closing happened in range : {}'.format(bool(closings_evening)))
-            logger.info('Opening notification was sent today : {}'.format(bool(actual_date.day == last_opening_notification.day)))
-            logger.info('No notification was sent today : {}'.format(bool(actual_date > limit_closing_notification)))
-            logger.info('Last notification date : {}'.format(last_closing_notification))
-            logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= limit_closing_approximate_range)))
+            pass
+            # logger.info('Closing :')
+            # logger.info('Closing happened in range : {}'.format(bool(closings_evening)))
+            # logger.info('Opening notification was sent today : {}'.format(bool(actual_date.day == last_opening_notification.day)))
+            # logger.info('No notification was sent today : {}'.format(bool(actual_date > limit_closing_notification)))
+            # logger.info('Last notification date : {}'.format(last_closing_notification))
+            # logger.info('Actual time is still in approximate range : {}'.format(bool(actual_date <= limit_closing_approximate_range)))
 
         if closings_evening and actual_date > limit_closing_notification and actual_date.day == last_opening_notification.day and actual_date <= limit_closing_approximate_range:
             last_closing = closings_evening[len(closings_evening)-1]
@@ -96,7 +98,7 @@ def slack():
                 if serializer.is_valid():
                     serializer.save()
                     logger.info('Slack closing notifications sended.')
-                    data = json.dumps({"text": "Bonne nuit les suricats :night_with_stars:"})
+                    data = json.dumps({"text": "Bonne nuite mes loutes ! :night_with_stars:"})
                     requests.post(url=slack_url, data=data, headers=headers)
                 else:
                     logger.error('Slack closing notifications serializer')
