@@ -59,6 +59,7 @@ def slack():
             recent_closings = SensorData.objects.filter(type=mc).filter(data='1').filter(
                 created__range=(last_opening.created, last_opening.created + OPENING_DELAY))
             if int(os.environ.get('LOG', '0')):
+                pass
                 # logger.info('No closings : {}'.format(bool(not recent_closings)))
                 # logger.info('In short delay : {}'.format(bool(actual_date >= last_opening.created + OPENING_DELAY )))
                 # logger.info('Date observed : {}'.format(last_opening.created))
